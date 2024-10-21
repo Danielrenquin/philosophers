@@ -19,6 +19,7 @@ void    init_tb(t_table *tb, char **argv)
     tb->tdie = ft_atoi(argv[2]);
     tb->teat = ft_atoi(argv[3]);
     tb->tsleep = ft_atoi(argv[4]);
+    tb->is_die = 0;
     if(argv[5])
         tb->nb_meal = ft_atoi(argv[5]);
     else
@@ -39,12 +40,17 @@ void    init_ph(t_table *tb)
     tb->forks = malloc(sizeof(pthread_mutex_t) * tb->nb_philo);
     if (tb->forks == NULL)
         return ;
+    tb->end = malloc(sizeof(pthread_mutex_t)* tb->nb_philo);
+    if (tb->end == NULL)
+        return ;
     while (i < tb->nb_philo)
     {
+        if (pthread_mutex_init(&tb->end[i], NULL) != 0)
+            return;
         if (pthread_mutex_init(&tb->forks[i], NULL) != 0)
             return ;
         tb->ph[i].n_philo = i + 1;
-        tb->ph[i].last_meal = 1;
+        tb->ph[i].last_meal = current_timestamp();
         tb->ph[i].odd = i % 2;
         tb->ph[i].tb = tb;
         tb->ph[i].l_fork = &tb->forks[i];
@@ -94,6 +100,8 @@ void    routine(t_philo *philo)
         i++;
     }
 }
+
+
 
 
 

@@ -19,9 +19,9 @@ void display_table_and_philos(t_table *tb)
     // Affichage des informations de la table
     printf("Informations de la table:\n");
     printf("Nombre de philosophes : %d\n", tb->nb_philo);
-    printf("Temps avant de mourir (tdie) : %d ms\n", tb->tdie);
-    printf("Temps pour manger (teat) : %d ms\n", tb->teat);
-    printf("Temps pour dormir (tsleep) : %d ms\n", tb->tsleep);
+    printf("Temps avant de mourir (tdie) : %ld ms\n", tb->tdie);
+    printf("Temps pour manger (teat) : %ld ms\n", tb->teat);
+    printf("Temps pour dormir (tsleep) : %ld ms\n", tb->tsleep);
     printf("Nombre de repas par philosophe : %d\n", tb->nb_meal);
 
     printf("\n---\n\n");

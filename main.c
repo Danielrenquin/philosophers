@@ -30,55 +30,6 @@
     return (0);
 }*/
 
-/*int main(int argc, char **argv)
-{
-    t_table table;
-
-    // Vérifie les arguments passés en ligne de commande
-    if (check_in(argc, argv) != 0)
-        return (1);
-
-    // Initialisation de la table
-    init_tb(&table, argv);
-
-    // Initialisation des philosophes
-    init_ph(&table);
-
-    // Lancement des threads pour chaque philosophe
-    int i = 0;
-    while (i < table.nb_philo)
-    {
-        if (pthread_create(&table.ph[i].td, NULL, philosopher_routine, &table.ph[i]) != 0)
-        {
-            fprintf(stderr, "Erreur : Impossible de créer le thread pour le philosophe %d\n", i + 1);
-            return (1);
-        }
-        i++;
-    }
-
-    // Attendre que tous les philosophes aient terminé (bien que ici ils tournent en boucle infinie)
-    i = 0;
-    while (i < table.nb_philo)
-    {
-        if (pthread_join(table.ph[i].td, NULL) != 0)
-        {
-            fprintf(stderr, "Erreur : Impossible de joindre le thread du philosophe %d\n", i + 1);
-            return (1);
-        }
-        i++;
-    }
-
-    // Détruire les mutex et libérer la mémoire
-    i = 0;
-    while (i < table.nb_philo)
-    {
-        pthread_mutex_destroy(&table.ph[i].fork);
-        i++;
-    }
-    free(table.ph); // Libérer la mémoire allouée pour les philosophes
-
-    return (0);
-}*/
 int main(int argc, char **argv)
 {
     t_table tb;
@@ -100,6 +51,11 @@ int main(int argc, char **argv)
             printf("Error: Failed to create thread for philosopher %d\n", i + 1);
             return (1);
         }
+        if (pthread_create(&tb.ph[i].die, NULL, (void *(*)(void *))is_finish, NULL) != 0)
+        {
+            printf("Error: Failed to create thread for philosopher %d\n", i + 1);
+            return (1);
+        }
         i++;
     }
 
@@ -108,6 +64,7 @@ int main(int argc, char **argv)
     while (i < tb.nb_philo)
     {
         pthread_join(tb.ph[i].td, NULL);
+        pthread_join(tb.ph[i].die, NULL);
         i++;
     }
 
