@@ -20,6 +20,8 @@ void    init_tb(t_table *tb, char **argv)
     tb->teat = ft_atoi(argv[3]);
     tb->tsleep = ft_atoi(argv[4]);
     tb->is_die = 0;
+    pthread_mutex_init(&tb->end, NULL);
+    pthread_mutex_init(&tb->write, NULL);
     if(argv[5])
         tb->nb_meal = ft_atoi(argv[5]);
     else
@@ -40,26 +42,24 @@ void    init_ph(t_table *tb)
     tb->forks = malloc(sizeof(pthread_mutex_t) * tb->nb_philo);
     if (tb->forks == NULL)
         return ;
-    tb->end = malloc(sizeof(pthread_mutex_t)* tb->nb_philo);
-    if (tb->end == NULL)
-        return ;
     while (i < tb->nb_philo)
     {
-        if (pthread_mutex_init(&tb->end[i], NULL) != 0)
-            return;
         if (pthread_mutex_init(&tb->forks[i], NULL) != 0)
             return ;
         tb->ph[i].n_philo = i + 1;
-        tb->ph[i].last_meal = current_timestamp();
+        tb->ph[i].last_meal = current_timestamp(); // a mettre apres la creation de tout les thread???
         tb->ph[i].odd = i % 2;
         tb->ph[i].tb = tb;
         tb->ph[i].l_fork = &tb->forks[i];
-        tb->ph[i].r_fork = &tb->forks[(i + 1) % tb->nb_philo]; 
+        tb->ph[i].r_fork = &tb->forks[(i + 1) % tb->nb_philo];
+        tb->ph[i].meals_eaten = 0; 
         i++;
     }
     return ;
 }
-
+// La fonction actual_time renvoie donc le nombre total
+//de millisecondes écoulées depuis le 1er janvier 1970 (l'époque Unix), 
+//en combinant les secondes et microsecondes fournies par gettimeofday.
 long current_timestamp(void)
 {
     struct timeval tv;
@@ -68,39 +68,37 @@ long current_timestamp(void)
     // Convertit les secondes et microsecondes en millisecondes
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
-
-void    routine(t_philo *philo)
+//La fonction standard usleep fait une pause
+// pour au minimum le temps indiqué en microsecondes,
+// mais en réalité, le temps de pause peut être plus long.
+// Cela peut être dû à des facteurs comme
+// la precision de l' horloge systeme
+//la gestion des processus
+void	ft_usleep(long int time_in_ms)
 {
-    int i = 0;
-    while (i < 5) //!!!dans cette boucle definir quand le repas est fini!!!
-    {
-        // Le philosophe pense
-        printf("%ld %d is thinking\n", current_timestamp(), philo->n_philo);
-        
-        // Le philosophe essaie de prendre la fourchette gauche
-        pthread_mutex_lock(philo->l_fork);
-        printf("%ld %d has taken a fork\n", current_timestamp(), philo->n_philo);
+	long int	start_time;
 
-        // Le philosophe essaie de prendre la fourchette droite
-        pthread_mutex_lock(philo->r_fork);
-        printf("%ld %d has taken a fork\n", current_timestamp(), philo->n_philo);
-
-        // Le philosophe mange
-        printf("%ld %d is eating\n", current_timestamp(), philo->n_philo);
-        philo->last_meal = current_timestamp(); // Met à jour le dernier temps de repas
-        usleep(philo->tb->teat * 1000); // Simule le temps de manger
-
-        // Le philosophe repose les fourchettes après avoir mangé
-        pthread_mutex_unlock(philo->r_fork);
-        pthread_mutex_unlock(philo->l_fork);
-
-        // Le philosophe dort
-        printf("%ld %d is sleeping\n", current_timestamp(), philo->n_philo);
-        usleep(philo->tb->tsleep * 1000); // Simule le temps de dormir
-        i++;
-    }
+	start_time = 0;
+	start_time = current_timestamp();
+	while ((current_timestamp() - start_time) < time_in_ms)
+		usleep(time_in_ms / 10);
 }
+int     launch_philo(t_table *tb)
+{
+    int i;
 
+    i = 0;
+    while(i < tb->nb_philo)
+    {
+        if(pthread_create(&tb->ph[i].td, NULL, routine, (void *)&tb->ph[i]) != 0)
+        {
+            printf("Error creating philosopher thread\n");
+            return (1);
+        }
+        i++;
+    } 
+    return (0);
+}
 
 
 

@@ -30,7 +30,7 @@
     return (0);
 }*/
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     t_table tb;
     int i;
@@ -64,10 +64,40 @@ int main(int argc, char **argv)
     while (i < tb.nb_philo)
     {
         pthread_join(tb.ph[i].td, NULL);
-        pthread_join(tb.ph[i].die, NULL);
+        //pthread_join(tb.ph[i].die, NULL);
         i++;
     }
 
     return (0);
+}*/
+int main(int argc, char **argv)
+{
+    t_table tb;
+
+    if (check_in(argc, argv) == 1)
+        return (1);
+    init_tb(&tb, argv);         
+    init_ph(&tb);
+    launch_philo(&tb);               
+    int i = 0;
+    /*while (i < tb.nb_philo)
+    {
+        if (pthread_create(&tb.ph[i].td, NULL, philosopher_routine, (void *)&tb.ph[i]) != 0)
+        {
+            printf("Error creating philosopher thread\n");
+            return (1);
+        }
+        i++;
+    }
+    i = 0;*/
+    while (i < tb.nb_philo)
+    {
+        pthread_join(tb.ph[i].td, NULL);
+        i++;
+    }
+    // Nettoyage des ressources a coder...
+    //cleanup_resources(&tb);
+    return 0;
 }
+
 

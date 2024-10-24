@@ -39,6 +39,7 @@ typedef struct s_philo
     pthread_t           td;         //thread du philosophe
     pthread_t           die;        //thread qui verifie la mort
     long int            last_meal;  //indique le temp du dernier repas en milliseconds
+    int                 meals_eaten;
     t_table             *tb;        //???
 
 } t_philo;
@@ -52,9 +53,11 @@ typedef struct s_table
     long int                teat;       //argv4 milliseconds
     int                  nb_meal;       //argv5 nombre de repas a prendre par philosophe (optionelle)
     pthread_mutex_t       *forks;
-    pthread_mutex_t          *end;       //repas fini ou philo mort
+    pthread_mutex_t          end;       //repas fini ou philo mort
+    pthread_mutex_t        write;
     int                   is_die;       //renvoie 1 qui un philo est mort
-    t_philo     *ph;                    //???
+    t_philo                  *ph;       //???
+    long int           start_time;
 } t_table;
 
 int     check_in(int argc, char **argv);
@@ -63,9 +66,11 @@ int     ft_atoi(char *str);
 int     overflow(int argc, char **argv);
 void    init_tb(t_table *tb, char **argv);
 void    init_ph(t_table *tb);
-void    display_table_and_philos(t_table *table); //remove at end
-void    routine(t_philo *philo);
-void    is_finish(void *arg);
 long    current_timestamp(void);
+void	ft_usleep(long int time_in_ms);
+void    display_table_and_philos(t_table *table); //remove at end
+void    *is_dead(void *data);
+void    *routine(void *arg);
+int     launch_philo(t_table *tb);
 
 #endif
