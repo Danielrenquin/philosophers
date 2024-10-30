@@ -12,6 +12,8 @@
 
 # include "philosophers.h"
 
+//le projet ne comporte a priori pas de memory leaks
+//data race a voir
 int main(int argc, char **argv)
 {
     t_table tb;
@@ -20,7 +22,8 @@ int main(int argc, char **argv)
         return (1);
     init_tb(&tb, argv);         
     init_ph(&tb);
-    launch_philo(&tb);               
+    launch_philo(&tb);
+    cleanup(&tb);               
     return 0;
 }
 

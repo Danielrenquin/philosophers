@@ -27,7 +27,7 @@
 #define COLOR_CYAN "\033[0;36m"
 #define COLOR_MAGENTA "\033[0;35m"
 #define COLOR_BRIGHT_YELLOW "\033[1;33m"
-#define COLOR_RESET "\033[0m" //???
+#define COLOR_RESET "\033[0m"
 
 /*la structure philo contiendra les donner propre a un philosophe
 tandis que la structure table contiendra des donner commune a tout
@@ -48,7 +48,8 @@ typedef struct s_philo
     pthread_t           td;         //thread du philosophe
     pthread_t           die;        //thread qui verifie la mort
     long int            last_meal;  //indique le temp du dernier repas en milliseconds
-    int                 meals_eaten;
+    int                 meals_eaten;//compteur du nombre de repas ayant ete manger
+    int                 is_eating;
     t_table             *tb;        //???
 
 } t_philo;
@@ -63,7 +64,7 @@ typedef struct s_table
     int                  nb_meal;       //argv5 nombre de repas a prendre par philosophe (optionelle)
     pthread_mutex_t       *forks;
     pthread_mutex_t          end;       //repas fini ou philo mort
-    pthread_mutex_t       eating;
+    pthread_mutex_t       eating;       //pour que le philosophe ne meurt pas pendant qu' il mange
     pthread_mutex_t        write;
     int                   is_die;       //renvoie 1 qui un philo est mort
     t_philo                  *ph;       //???
@@ -87,4 +88,5 @@ void    sleeping(t_philo *philo, long start_time);
 void    thinking(t_philo *philo, long start_time);
 void    lock_msg(t_philo *philo, char *message);
 int     check_if_dead(t_philo *philo);
+void    cleanup(t_table *tb);
 #endif

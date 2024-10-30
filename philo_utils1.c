@@ -28,7 +28,6 @@ int ft_strcmp(char *s1, char *s2)
 void lock_msg(t_philo *philo, char *message)
 {
     pthread_mutex_lock(&philo->tb->write);
-
     if (philo->tb->is_die == 0)
     {
         const char *color;
@@ -47,16 +46,42 @@ void lock_msg(t_philo *philo, char *message)
         printf("%s%ld %d %s%s\n", color, current_timestamp() - philo->tb->start_time, philo->n_philo, message, COLOR_RESET);
     }
     pthread_mutex_unlock(&philo->tb->write);
+    return ;
 }
 int check_if_dead(t_philo *philo)
 {
     pthread_mutex_lock(&philo->tb->end);
+    //pthread_mutex_lock(&philo->tb->eating);
     if (philo->tb->is_die)
     {
         pthread_mutex_unlock(&philo->tb->end);
         return 0; // Philosophe est mort
     }
+    //pthread_mutex_unlock(&philo->tb->eating);
     pthread_mutex_unlock(&philo->tb->end);
     return 1; // Philosophe est encore en vie
 }
+void    cleanup(t_table *tb)
+{
+    int i;
+
+    // Détruire tous les mutex des fourchettes
+    if (tb->forks)
+    {
+        for (i = 0; i < tb->nb_philo; i++)
+        {
+            pthread_mutex_destroy(&tb->forks[i]);
+        }
+        free(tb->forks);
+    }
+    // Détruire les mutex de fin, d'écriture et d'alimentation
+    pthread_mutex_destroy(&tb->end);
+    pthread_mutex_destroy(&tb->eating);
+    pthread_mutex_destroy(&tb->write);
+
+    // Libérer la mémoire des philosophes
+    if (tb->ph)
+        free(tb->ph);
+}
+
 

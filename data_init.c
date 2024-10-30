@@ -23,6 +23,7 @@ void    init_tb(t_table *tb, char **argv)
     tb->start_time = current_timestamp();
     pthread_mutex_init(&tb->end, NULL);
     pthread_mutex_init(&tb->eating, NULL);
+    pthread_mutex_init(&tb->write, NULL);
     if(argv[5])
         tb->nb_meal = ft_atoi(argv[5]);
     else
@@ -97,11 +98,6 @@ int     launch_philo(t_table *tb)
             return (1);
         }
         i++;
-    }
-    while (tb->is_die == 0)
-    {
-        if(tb->is_die ==  1)
-            break;
     }
     i = 0;
     while (i < tb->nb_philo)
